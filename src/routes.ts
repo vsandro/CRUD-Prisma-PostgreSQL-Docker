@@ -1,109 +1,14 @@
 import express from 'express';
-const routes = Router();
 
-import { PrismaClient } from '@prisma/client';
 import { Router } from 'express';
-
-const prisma = new PrismaClient()
+const routes = Router();
 
 const app = express()
 app.use(express.json())
 
-// Creates a new artist.
-app.post(`/artist`, async (req, res) => {
-    const result = await prisma.artist.create({
-        data: { ...req.body },
-    })
-    res.json({
-        success: true,
-        payload: result,
-    })
-})
+import { createArtist, getArtists } from '../src/modules/artist/Artist';
 
-// Get all Artist.
-app.get('/artists', async (req, res) => {
-    const artists = await prisma.artist.findMany()
-    res.json({
-        success: true,
-        payload: artists,
-    })
-})
-  
-// Fetches all released songs.
-app.get('/playlist', async (req, res) => {
-    const songs = await prisma.song.findMany({
-        where: { released: true },
-        include: { singer: true }
-    })
-    res.json({
-        success: true,
-        payload: songs,
-    })
-})
-
-// Creates (or compose) a new song (unreleased)
-app.post(`/song`, async (req, res) => {
-    const { title, content, singerEmail } = req.body
-    const result = await prisma.song.create({
-        data: {
-            title,
-            content,
-            released: false,
-            singer: { connect: { email: singerEmail } },
-        },
-    })
-    res.json({
-        success: true,
-        payload: result,
-    })
-})
-
-// Deletes a song by its ID.
-app.delete(`/song/:id`, async (req, res) => {
-    const { id } = req.params
-    const song = await prisma.song.delete({
-        where: { id: Number(id) },
-    })
-    res.json({
-        success: true,
-        payload: song,
-    })
-})
-
-// Fetches a specific song by its ID.
-app.get(`/song/:id`, async (req, res) => {
-    const { id } = req.params
-    const song = await prisma.song.findFirst({
-        where: { id: Number(id) },
-    })
-    res.json({
-        success: true,
-        payload: song,
-    })
-})
-
-
-// Sets the released field of a song to true.
-app.put('/song/release/:id', async (req, res) => {
-    const { id } = req.params
-    const song = await prisma.song.update({
-        where: { id: Number(id) },
-        data: { released: true },
-    })
-    res.json({
-        success: true,
-        payload: song,
-    })
-})
-
-app.use((req, res, next) => {
-    res.status(404);
-    return res.json({
-        success: false,
-        payload: null,
-        message: `API SAYS: Endpoint not found for path: ${req.path}`,
-    });
-});
+routes.post('/artist', createArtist)
+routes.get('/artists', getArtists)
 
 export { routes };
-

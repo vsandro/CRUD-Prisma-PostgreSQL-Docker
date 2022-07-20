@@ -8,17 +8,7 @@ generator client {
 }
 
 model Artist {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  songs Song[]
-}
-
-model Song {
-  id       Int     @id @default(autoincrement())
-  title    String
-  content  String?
-  released Boolean @default(false)
-  singer   Artist? @relation(fields: [singerId], references: [id])
-  singerId Int?
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
 }
