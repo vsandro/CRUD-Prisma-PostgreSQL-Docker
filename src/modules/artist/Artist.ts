@@ -1,21 +1,21 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../database/prismaClient';
 
-// Creates a new artist.
+// Create
 async function createArtist(request: Request, response: Response) {
       const { name, email } = request.body;
 
-      const exist = await prisma.artist.findFirst({
+      const exists = await prisma.artist.findFirst({
             where: {
-                  name: {
-                        equals: name,
+                  email: {
+                        equals: email,
                         mode: 'insensitive',
                   },
             },
       });
       
-      if (exist) {
-            throw new Error('Artist already exists');
+      if (exists) {
+            throw new Error('Email already exists');
       }
                 
       const result = await prisma.artist.create({
@@ -29,14 +29,67 @@ async function createArtist(request: Request, response: Response) {
             payload: result,
       })
 }
-
   
-// Get all Artist.
+// Read All
 async function getArtists(request: Request, response: Response) {
       const artists = await prisma.artist.findMany();
   
       return response.json(artists);
 }
 
-export { createArtist, getArtists };
+// Update
+async function updateArtist(request: Request, response: Response) {
+      const { id } = request.params;
+
+      const exists = await prisma.artist.findFirst({
+            where: {
+                  id: {
+                        equals: Number(id),
+                  },
+            },
+      });
+      
+      if (!exists) {
+            throw new Error('Id not found');
+      }
+
+      const result = await prisma.artist.update({
+            where: {
+                  id: {
+                        equals: id,
+                  },
+            },
+        })
+      response.json({
+            success: true,
+            payload: result,
+      })
+}
+
+// Delete
+async function deleteArtist(request: Request, response: Response) {
+      const { id } = request.params;
+
+      const exists = await prisma.artist.findFirst({
+            where: {
+                  id: {
+                        equals: id,
+                  },
+            },
+      });
+      
+      if (!exists) {
+            throw new Error('Id not found');
+      }
+
+      const result = await prisma.artist.delete({
+          where: { id: Number(id) },
+      })
+      response.json({
+            success: true,
+            payload: result,
+      })
+}
+
+export { createArtist, getArtists, updateArtist, deleteArtist };
 

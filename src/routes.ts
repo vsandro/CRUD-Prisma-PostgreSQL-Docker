@@ -6,9 +6,11 @@ const routes = Router();
 const app = express()
 app.use(express.json())
 
-import { createArtist, getArtists } from '../src/modules/artist/Artist';
+import { createArtist, deleteArtist, getArtists, updateArtist } from '../src/modules/artist/Artist';
 
 routes.post('/artist', createArtist)
 routes.get('/artists', getArtists)
+routes.put('/artists/:id', updateArtist)
+routes.delete('/artists/:id', deleteArtist)
 
 export { routes };
